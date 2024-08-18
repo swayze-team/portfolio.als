@@ -27,15 +27,9 @@
   }
 
   @keyframes gradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   .container {
@@ -105,12 +99,8 @@
   }
 
   @keyframes glow {
-    from {
-      text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
-    }
-    to {
-      text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
-    }
+    from { text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color); }
+    to { text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color); }
   }
 
   .hero p {
@@ -473,9 +463,9 @@
         <div class="modern-box">
           <p>Vous avez un projet passionnant ou une idée innovante ? N'hésitez pas à me contacter !</p>
           <form id="contact-form">
-            <input type="text" placeholder="Votre nom" required>
-            <input type="email" placeholder="Votre email" required>
-            <textarea placeholder="Votre message" required></textarea>
+            <input type="text" id="name" placeholder="Votre nom" required>
+            <input type="email" id="email" placeholder="Votre email" required>
+            <textarea id="message" placeholder="Votre message" required></textarea>
             <button type="submit" class="cta-button">Envoyer</button>
           </form>
         </div>
@@ -487,21 +477,39 @@
 
   <div class="music-player">
     <label class="music-toggle">
-      <input type="checkbox" id="toggle-music">
+      <input type="checkbox" id="toggle-music" checked>
       <span class="music-slider"></span>
     </label>
     <span>Musique</span>
   </div>
 
   <script>
-    // Welcome overlay
+    // Welcome overlay avec animation améliorée
     const welcomeOverlay = document.querySelector('.welcome-overlay');
+    const welcomeText = document.querySelector('.welcome-text');
+
+    gsap.fromTo(welcomeText, 
+      { opacity: 0, scale: 0.5 }, 
+      { opacity: 1, scale: 1, duration: 1.5, ease: "elastic.out(1, 0.5)" }
+    );
+
     setTimeout(() => {
-      welcomeOverlay.style.opacity = '0';
-      setTimeout(() => {
-        welcomeOverlay.style.display = 'none';
-      }, 1000);
+      gsap.to(welcomeOverlay, { 
+        opacity: 0, 
+        duration: 1, 
+        onComplete: () => welcomeOverlay.style.display = 'none'
+      });
     }, 3000);
+
+    // Smooth scrolling pour les liens de navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
 
     // Cursor effect
     const cursor = document.querySelector('.cursor');
@@ -571,7 +579,7 @@
       }
     });
 
-    // New VFX: Glowing Orbs
+    // Glowing Orbs
     function createGlowingOrb() {
       const orb = document.createElement('div');
       orb.classList.add('glowing-orb');
@@ -588,7 +596,7 @@
 
     setInterval(createGlowingOrb, 2000);
 
-    // New VFX: Shooting Stars
+    // Shooting Stars
     function createShootingStar() {
       const star = document.createElement('div');
       star.classList.add('shooting-star');
@@ -603,20 +611,45 @@
 
     setInterval(createShootingStar, 1000);
 
-    // Form submission
+    // Form submission avec envoi au webhook Discord
     document.getElementById('contact-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = e.target.elements[0].value;
-      const email = e.target.elements[1].value;
-      const message = e.target.elements[2].value;
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
       
-      // Here you would typically send this data to a server
-      console.log('Name:', name);
-      console.log('Email:', email);
-      console.log('Message:', message);
+      const webhookURL = 'https://discord.com/api/webhooks/1274750599866617898/JIaFd4BQPqe2MZUDbxro-Mtk_dgKD9PhayoaKkDNXILISeFX4evS29XoIEY9sj6TfDxi';
 
-      alert('Merci pour votre message ! Je vous répondrai bientôt.');
-      e.target.reset();
+      const embed = {
+        title: "Nouveau message de contact",
+        color: 0x00ffff,
+        fields: [
+          { name: "Nom", value: name },
+          { name: "Email", value: email },
+          { name: "Message", value: message }
+        ],
+        timestamp: new Date()
+      };
+
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ embeds: [embed] }),
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Merci pour votre message ! Je vous répondrai bientôt.');
+          e.target.reset();
+        } else {
+          alert('Une erreur s\'est produite. Veuillez réessayer plus tard.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur s\'est produite. Veuillez réessayer plus tard.');
+      });
     });
 
     // Parallax scrolling effect
@@ -732,10 +765,20 @@
     const audio = new Audio('https://audio.jukehost.co.uk/3g9ZAeIcJzZ5ysEwlClzY0aP9QwyFDOF');
     audio.loop = true;
 
+    // Démarrage automatique de la musique
+    window.addEventListener('load', () => {
+      audio.play().catch(error => {
+        console.error('Failed to autoplay audio:', error);
+        // En cas d'échec de l'autoplay, on laisse le contrôle à l'utilisateur
+        toggleMusicBtn.checked = false;
+      });
+    });
+
     toggleMusicBtn.addEventListener('change', () => {
       if (toggleMusicBtn.checked) {
         audio.play().catch(error => {
           console.error('Failed to play audio:', error);
+          toggleMusicBtn.checked = false;
         });
       } else {
         audio.pause();
