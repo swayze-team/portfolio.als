@@ -382,6 +382,25 @@
     transform: translateY(-5px);
   }
 
+  .skill-bar {
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .skill-name {
+    display: inline-block;
+    width: 120px;
+    font-weight: bold;
+  }
+
+  .skill-level {
+    display: inline-block;
+    height: 20px;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    vertical-align: middle;
+  }
+
   @media (max-width: 768px) {
     .hero h1 {
       font-size: 3rem;
@@ -527,16 +546,16 @@
 
     // Skills visualization
     const skills = [
-      { name: 'JavaScript', level: 90 },
-      { name: 'Python', level: 85 },
-      { name: 'C++', level: 75 },
-      { name: 'Three.js', level: 80 },
-      { name: 'WebGL', level: 70 },
-      { name: 'CSS Animation', level: 85 },
-      { name: 'React', level: 80 },
-      { name: 'Node.js', level: 75 },
-      { name: 'Vue.js', level: 70 },
-      { name: 'TypeScript', level: 80 },
+      { name: 'Python', level: 100 },
+      { name: 'JavaScript', level: 100 },
+      { name: 'Node.js', level: 100 },
+      { name: 'Three.js', level: 100 },
+      { name: 'CSS', level: Math.floor(Math.random() * 50) },
+      { name: 'HTML', level: Math.floor(Math.random() * 50) },
+      { name: 'React', level: Math.floor(Math.random() * 50) },
+      { name: 'Vue.js', level: Math.floor(Math.random() * 50) },
+      { name: 'WebGL', level: Math.floor(Math.random() * 50) },
+      { name: 'TypeScript', level: Math.floor(Math.random() * 50) },
     ];
 
     const skillsContainer = document.getElementById('skills-container');
@@ -545,7 +564,8 @@
       skillBar.classList.add('skill-bar');
       skillBar.innerHTML = `
         <span class="skill-name">${skill.name}</span>
-        <div class="skill-level" style="width: ${skill.level}%; height: 10px; background-color: var(--primary-color); border-radius: 5px; margin-top: 5px;"></div>
+        <div class="skill-level" style="width: ${skill.level}%;"></div>
+        <span>${skill.level}%</span>
       `;
       skillsContainer.appendChild(skillBar);
     });
